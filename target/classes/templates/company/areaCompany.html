@@ -40,8 +40,8 @@
             <p>Banco Nubank</p>
         </div>
 
-        <div class="mt-2 row">
-	        <div class="col-md-6" th:each="loan : ${loans}">
+        <div class="mt-2 row" style="overflow-y: auto">
+	        <div class="mb-4 col-md-6" th:each="loan : ${loans}">
 	        	<div style="background: #F5F5F5; padding: 1em; border-radius: 12px; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)">
 	        		<input type="hidden" name="codeLoan" th:value="${loan.code}"/>
 	        		
