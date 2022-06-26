@@ -71,8 +71,17 @@ public class ClientController {
 	
 	@GetMapping("/client/home")
 	public ModelAndView homeClient() {
-		logger.trace("Entrou em index");
+		logger.trace("Entrou em homeClient");
 		ModelAndView mv = new ModelAndView("/client/areaClient");
+		
+		List<Loan> loans = loanRepository.findByClientCode((long) 1);
+		
+		mv.addObject("loans", loans);
+		
+		for(Loan l : loans) {
+			logger.trace("loans::: codigo:", l.getCode());
+		}
+		
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}

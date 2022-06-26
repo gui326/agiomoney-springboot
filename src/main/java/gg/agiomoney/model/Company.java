@@ -20,6 +20,7 @@ public class Company implements Serializable{
 	@SequenceGenerator(name = "generator", sequenceName = "company_code_seq", allocationSize = 1)
 	@GeneratedValue(generator = "generator", strategy = GenerationType.SEQUENCE)
 	private Long code;
+	
 	private String name;
 	private String email;
 	private String password;

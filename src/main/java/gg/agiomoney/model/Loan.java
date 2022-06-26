@@ -27,11 +27,11 @@ public class Loan implements Serializable{
 	@GeneratedValue(generator = "generator", strategy = GenerationType.SEQUENCE)
 	private Long code;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "code_client")
 	private Client client;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "code_company")
 	private Company company;
 	
