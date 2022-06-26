@@ -48,14 +48,22 @@
             </a>
         </div>
         
-        <div class="row">
+        <div class="mt-2 row">
 	        <div class="col-md-3" th:each="loan : ${loans}">
-	        	<div style="background: #F5F5F5; padding: 1em; border-radius: 12px; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)">
+	        	<form th:action="@{/client/loan/update}" method="post" style="background: #F5F5F5; padding: 1em; border-radius: 12px; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)">
+	        		<input type="hidden" name="codeLoan" th:value="${loan.code}"/>
+	        	
 	        		<p class="pb-2 m-0" style="font-weight: 500; font-size: 18px;">Empresa: <span th:text="${loan.company.name}"></span></p>
 	        		<p class="m-0" style="font-weight: 300">Parcelas: <span th:text="*{loan.installments}"></span> X R$ <span th:text="*{#numbers.formatDecimal(loan.total / loan.installments, 0, 'POINT', 2, 'COMMA')}"></span></p>
 	        		<p class="m-0" style="font-weight: 300">Status: <span th:text="${loan.state}"></span></p>
 	        		<p class="pt-1 m-0" style="font-weight: 500; font-size: 16px;">Total: R$ <span th:text="*{#numbers.formatDecimal(loan.total, 0, 'POINT', 2, 'COMMA')}">Total</span></p>
-	        	</div>
+	        		
+	        		<div class="pt-3" th:if="${loan.state == 'Contraproposta'}">
+	        			<button type="submit" class="btn btn-primary buttonPatternOne">
+			                Aceitar contraproposta
+			            </button>
+	        		</div>
+	        	</form>
 	        </div>
         </div>
         

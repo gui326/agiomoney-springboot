@@ -44,9 +44,11 @@ nav p:hover{
 }
 
 .buttonPatternOne{
+	font-family: 'Inter', sans-serif;
+	font-weight: 700;
     height: 50px;
     background-color: #9046CF;
-    border-radius: 12px;
+    border-radius: 50px;
     color: white;
     border: 0;
     padding-left: 1.5em;

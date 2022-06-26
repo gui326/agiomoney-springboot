@@ -78,10 +78,6 @@ public class ClientController {
 		
 		mv.addObject("loans", loans);
 		
-		for(Loan l : loans) {
-			logger.trace("loans::: codigo:", l.getCode());
-		}
-		
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
@@ -121,9 +117,7 @@ public class ClientController {
 	}
 	
 	@PostMapping("/client/loan/contract")
-	public ModelAndView contractLoan(String companyId, String installments, String total) {
-		ModelAndView mv = new ModelAndView("mensagem");
-		
+	public String contractLoan(String companyId, String installments, String total) {
 		Loan loan = new Loan();
 		
 		logger.trace("inicio 1111");
@@ -138,9 +132,19 @@ public class ClientController {
 		
 		loanService.saveLoan(loan);
 		
-		mv.addObject("mensagem", "Criado loan");
+		return "redirect:/client/home";
+	}
+	
+	@PostMapping("/client/loan/update")
+	public String clientUpdateLoan(String codeLoan) {
+		Optional<Loan> op = loanRepository.findById((long) Integer.parseInt(codeLoan));
+		Loan loan = op.get();
 		
-		return mv;
+		loan.setState("Finalizado");
+		
+		loanService.saveLoan(loan);
+		
+		return "redirect:/client/home";
 	}
 	
 

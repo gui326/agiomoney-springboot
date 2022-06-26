@@ -40,7 +40,75 @@
             <p>Banco Nubank</p>
         </div>
 
-        <div class="card__content">
+        <div class="mt-2 row">
+	        <div class="col-md-6" th:each="loan : ${loans}">
+	        	<div style="background: #F5F5F5; padding: 1em; border-radius: 12px; box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)">
+	        		<input type="hidden" name="codeLoan" th:value="${loan.code}"/>
+	        		
+	        		<div class="row">
+	        			<div class="col-md-7">
+	        				<p class="pb-2 m-0" style="font-weight: 500; font-size: 18px;">Cliente: <span th:text="${loan.client.name}"></span></p>
+	        				<p class="m-0" style="font-weight: 300">Parcelas: <span th:text="*{loan.installments}"></span> X R$ <span th:text="*{#numbers.formatDecimal(loan.total / loan.installments, 0, 'POINT', 2, 'COMMA')}"></span></p>
+	        				<p class="pt-1 m-0" style="font-weight: 500; font-size: 16px;">Total: R$ <span th:text="*{#numbers.formatDecimal(loan.total, 0, 'POINT', 2, 'COMMA')}">Total</span></p>
+	        			</div>
+	        		</div>
+	        		
+	        		<div class="pt-3" th:if="${loan.state == 'Pendente'}">
+		        		<div class="row">
+	        				<div class="col-md-6 text-center">
+	        					<form th:action="@{/company/loan/accept}" method="post">
+	        					
+		        					<input type="hidden" name="codeLoan" th:value="${loan.code}"/>
+		        					
+		        					<button type="submit" class="btn btn-primary buttonPatternOne">
+						                Aceitar Proposta
+						            </button>
+					            
+					            </form>
+	        				</div>
+	        				<div class="col-md-6 text-center">
+	        					<button th:attr="onclick=|handleOpen('${loan.code}')|" type="submit" style="background: white!important; color: var(--main-color); border: 1px solid var(--main-color)" class="btn btn-primary buttonPatternOne">
+					                Contraproposta
+					            </button>
+	        				</div>
+		        		</div>
+	        		</div>
+	        		
+	        		<div th:id="${'area__contraproposta' + loan.code}" style="display: none" class="mt-4">
+	        			<hr class="mt-4" style="opacity: .1">
+	        		
+	        			<form th:action="@{/company/loan/proposal}" method="post">
+	        				<input type="hidden" name="codeLoan" th:value="${loan.code}"/>
+	        				
+		        			<div class="row">
+		        				<div class="col-md-8">
+		        					<label>Novo Valor Total:</label>
+		        					
+		        					<input type="text" name="newTotal" class="form-control inputPatternOne" />
+		        				</div>
+		        				<div class="col-md-4 align-self-end text-center">
+		        					<button type="submit" style="background: white!important; color: var(--main-color); border: 1px solid var(--main-color)" class="btn btn-primary buttonPatternOne">
+						                Enviar
+						            </button>
+		        				</div>
+		        			</div>
+	        			</form>
+	        		</div>
+	        	
+	        		
+	        		<div class="pt-3 text-center" th:if="${loan.state == 'Finalizado'}">
+	        			<p class="m-0" style="font-weight: 500"><span th:text="${loan.state}"></span></p>
+	        		</div>
+	        		
+	        		<div class="pt-3 text-center" th:if="${loan.state == 'Contraproposta'}">
+	        			<p class="m-0" style="font-weight: 500">Contraproposta realizada, aguardando cliente...</p>
+	        		</div>
+
+	        	</div>
+	        </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(loans)}" class="card__content">
             <p style="font-size: 20px; color: grey">não possui nenhum empréstimo</p>
         </div>
     </div>
@@ -49,6 +117,15 @@
   <div class="imageFloating">
     <img src="/images/porquinho.png" alt="desenho porquinho de guardar dinheiro"/>
   </div>
+  
+  <script>
+  	function handleOpen(id){
+  		if(document.getElementById('area__contraproposta' + id).style.display === "block")
+  		document.getElementById('area__contraproposta' + id).style.display = "none";
+  		else 
+  		document.getElementById('area__contraproposta' + id).style.display = "block";
+  	}
+  </script>
 
 </body>
 </html>
