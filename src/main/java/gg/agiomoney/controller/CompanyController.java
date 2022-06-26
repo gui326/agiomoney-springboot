@@ -7,30 +7,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class ClientController {
+public class CompanyController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
+	private static final Logger logger = LoggerFactory.getLogger(CompanyController.class);
 	
-	@GetMapping("/client/login")
-	public ModelAndView loginClient() {
+	@GetMapping("/company/login")
+	public ModelAndView loginCompany() {
 		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("/client/loginClient");
+		ModelAndView mv = new ModelAndView("/company/loginCompany");
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
 	
-	@GetMapping("/client/register")
-	public ModelAndView registerClient() {
+	@GetMapping("/company/register")
+	public ModelAndView registerCompany() {
 		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("/client/registerClient");
+		ModelAndView mv = new ModelAndView("/company/registerCompany");
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
 	
-	@GetMapping("/client/home")
-	public ModelAndView homeClient() {
+	@GetMapping("/company/home")
+	public ModelAndView homeCompany() {
 		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("/client/areaClient");
+		ModelAndView mv = new ModelAndView("/company/areaCompany");
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
