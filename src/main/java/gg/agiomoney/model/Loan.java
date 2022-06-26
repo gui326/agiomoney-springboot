@@ -35,7 +35,7 @@ public class Loan implements Serializable{
 	@JoinColumn(name = "code_company")
 	private Company company;
 	
-	private String total;
+	private Double total;
 	private int installments;
 	private String state;
 	public Long getCode() {
@@ -56,10 +56,10 @@ public class Loan implements Serializable{
 	public void setCompany(Company company) {
 		this.company = company;
 	}
-	public String getTotal() {
+	public Double getTotal() {
 		return total;
 	}
-	public void setTotal(String total) {
+	public void setTotal(Double total) {
 		this.total = total;
 	}
 	public int getInstallments() {

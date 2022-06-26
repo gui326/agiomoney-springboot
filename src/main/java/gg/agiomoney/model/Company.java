@@ -23,7 +23,7 @@ public class Company implements Serializable{
 	private String name;
 	private String email;
 	private String password;
-	private String tax;
+	private Float tax;
 	
 	@Override
 	public int hashCode() {
@@ -69,10 +69,10 @@ public class Company implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public String getTax() {
+	public Float getTax() {
 		return tax;
 	}
-	public void setTax(String tax) {
+	public void setTax(Float tax) {
 		this.tax = tax;
 	}
 	
