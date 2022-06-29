@@ -6,4 +6,6 @@ import gg.agiomoney.model.Company;
 
 public interface CompanyRepository extends JpaRepository<Company, Long>{
 
+	public Company findByEmail(String email);
+	
 }

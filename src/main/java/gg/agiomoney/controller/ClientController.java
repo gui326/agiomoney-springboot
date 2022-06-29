@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -42,11 +45,35 @@ public class ClientController {
 	private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 	
 	@GetMapping("/client/login")
-	public ModelAndView loginClient() {
+	public ModelAndView loginClientView() {
 		logger.trace("Entrou em index");
 		ModelAndView mv = new ModelAndView("/client/loginClient");
 		logger.trace("Encaminhando para a view index");
 		return mv;
+	}
+	
+	@PostMapping("/client/login")
+	public String loginClient(Model model, HttpSession session, String email, String password) {
+		logger.trace("Entrou em index");
+		
+		
+		Client client = clientRepository.findByEmail(email);
+		if(client == null) {
+			model.addAttribute("mensagem", "Usuário não encontrado");
+			return "/client/loginClient";
+		}
+		
+		logger.trace("senha: {}", client.getPassword());
+		logger.trace("senha: {}", password);
+		
+		if(!client.getPassword().equals(password)) {
+			model.addAttribute("mensagem", "Senha incorreta");
+			return "/client/loginClient";
+		}
+		
+		session.setAttribute("client", client);
+		logger.trace("Encaminhando para a view index");
+		return "redirect:/client/home";
 	}
 	
 	@GetMapping("/client/register")
@@ -70,14 +97,19 @@ public class ClientController {
 	}
 	
 	@GetMapping("/client/home")
-	public ModelAndView homeClient() {
+	public ModelAndView homeClient(HttpSession session) {
 		logger.trace("Entrou em homeClient");
 		ModelAndView mv = new ModelAndView("/client/areaClient");
 		
-		List<Loan> loans = loanRepository.findByClientCode((long) 1);
+		Client client = (Client) session.getAttribute("client");
+		
+		logger.trace("client: {}", client.getCode());
+		
+		List<Loan> loans = loanRepository.findByClientCode(client.getCode());
 		
 		mv.addObject("loans", loans);
 		
+		mv.addObject("client", client);
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
@@ -89,15 +121,15 @@ public class ClientController {
 	}
 	
 	@PostMapping("/client/loan")
-	public ModelAndView clientLoans(Double value, int installments) {
+	public ModelAndView clientLoans(HttpSession session, Double value, int installments) {
 		ModelAndView mv = new ModelAndView("/client/loanClient");
 		
 		List<Company> companies = companyRepository.findAll();
 		List<Loan> loans = new ArrayList<Loan>();
 		
-		Long clientId = (long) 1; 
+		Client clientSession = (Client) session.getAttribute("client");
 		
-		Optional<Client> client = clientRepository.findById(clientId);
+		Optional<Client> client = clientRepository.findById(clientSession.getCode());
 		
 		for(Company company : companies) {
 			Loan loan = new Loan();
@@ -117,18 +149,16 @@ public class ClientController {
 	}
 	
 	@PostMapping("/client/loan/contract")
-	public String contractLoan(String companyId, String installments, String total) {
+	public String contractLoan(HttpSession session, String companyId, String installments, String total) {
 		Loan loan = new Loan();
 		
-		logger.trace("inicio 1111");
+		Client clientSession = (Client) session.getAttribute("client");
 		
 		loan.setCompany(companyRepository.findById((long) Integer.parseInt(companyId)).get());
 		loan.setInstallments(Integer.parseInt(installments));
 		loan.setTotal(Double.parseDouble(total));
 		loan.setState("Pendente");
-		loan.setClient(clientRepository.findById((long) 1).get());
-		
-		logger.trace("final 1111");
+		loan.setClient(clientSession);
 		
 		loanService.saveLoan(loan);
 		

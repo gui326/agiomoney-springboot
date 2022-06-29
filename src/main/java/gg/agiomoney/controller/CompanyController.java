@@ -3,14 +3,18 @@ package gg.agiomoney.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import gg.agiomoney.model.Client;
 import gg.agiomoney.model.Company;
 import gg.agiomoney.model.Loan;
 import gg.agiomoney.repository.CompanyRepository;
@@ -36,11 +40,29 @@ public class CompanyController {
 	private LoanService loanService;
 	
 	@GetMapping("/company/login")
-	public ModelAndView loginCompany() {
+	public ModelAndView loginCompanyView() {
 		logger.trace("Entrou em index");
 		ModelAndView mv = new ModelAndView("/company/loginCompany");
 		logger.trace("Encaminhando para a view index");
 		return mv;
+	}
+	
+	@PostMapping("/company/login")
+	public String loginCompany(Model model, HttpSession session, String email, String password) {
+		Company company = companyRepository.findByEmail(email);
+		if(company == null) {
+			model.addAttribute("mensagem", "Usuário não encontrado");
+			return "/company/loginCompany";
+		}
+		
+		if(!company.getPassword().equals(password)) {
+			model.addAttribute("mensagem", "Senha incorreta");
+			return "/company/loginCompany";
+		}
+		
+		session.setAttribute("company", company);
+		logger.trace("Encaminhando para a view index");
+		return "redirect:/company/home";
 	}
 	
 	@GetMapping("/company/register")
@@ -64,13 +86,16 @@ public class CompanyController {
 	}
 	
 	@GetMapping("/company/home")
-	public ModelAndView homeCompany() {
+	public ModelAndView homeCompany(HttpSession session) {
 		logger.trace("Entrou em index");
 		ModelAndView mv = new ModelAndView("/company/areaCompany");
 		
-		List<Loan> loans = loanRepository.findByCompanyCode((long) 1);
+		Company company = (Company) session.getAttribute("company");
+		
+		List<Loan> loans = loanRepository.findByCompanyCode(company.getCode());
 		
 		mv.addObject("loans", loans);
+		mv.addObject("company", company);
 		
 		return mv;
 	}
