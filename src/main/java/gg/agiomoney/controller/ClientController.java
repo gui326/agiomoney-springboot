@@ -51,11 +51,18 @@ public class ClientController {
 	private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 	
 	@GetMapping("/client/login")
-	public ModelAndView loginClientView() {
+	public String loginClientView(Model model, HttpSession session) {
 		logger.trace("Entrou em index");
 		ModelAndView mv = new ModelAndView("/client/loginClient");
-		logger.trace("Encaminhando para a view index");
-		return mv;
+		
+		Client client = (Client) session.getAttribute("client");
+		
+		if(client == null) {
+			logger.trace("Encaminhando para a view index");
+			return "/client/loginClient";
+		} else {
+			return "redirect:/client/home";
+		}
 	}
 	
 	@PostMapping("/client/login")
@@ -80,6 +87,16 @@ public class ClientController {
 		session.setAttribute("client", client);
 		logger.trace("Encaminhando para a view index");
 		return "redirect:/client/home";
+	}
+	
+	@GetMapping("/client/logout")
+	public ModelAndView logoutClient(HttpSession session) {
+		logger.trace("Entrou em index");
+		
+		session.removeAttribute("client");
+		
+		ModelAndView mv = new ModelAndView("/index");
+		return mv;
 	}
 	
 	@GetMapping("/client/register")

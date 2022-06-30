@@ -47,11 +47,16 @@ public class CompanyController {
 	private LoanService loanService;
 	
 	@GetMapping("/company/login")
-	public ModelAndView loginCompanyView() {
-		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("/company/loginCompany");
-		logger.trace("Encaminhando para a view index");
-		return mv;
+	public String loginCompanyView(HttpSession session, Model model) {
+		
+		Company company = (Company) session.getAttribute("company");
+		
+		if(company == null) {
+			logger.trace("Encaminhando para a view index");
+			return "/company/loginCompany";
+		} else {
+			return "redirect:/company/home";
+		}
 	}
 	
 	@PostMapping("/company/login")
@@ -70,6 +75,16 @@ public class CompanyController {
 		session.setAttribute("company", company);
 		logger.trace("Encaminhando para a view index");
 		return "redirect:/company/home";
+	}
+	
+	@GetMapping("/company/logout")
+	public ModelAndView logoutCompany(HttpSession session) {
+		logger.trace("Entrou em index");
+		
+		session.removeAttribute("company");
+		
+		ModelAndView mv = new ModelAndView("/index");
+		return mv;
 	}
 	
 	@GetMapping("/company/register")

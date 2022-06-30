@@ -26,10 +26,12 @@
 
       <div class="d-flex flex-row gap-4">
         <a th:href="@{/company/login}">
-          <p class="text-white">Login Empresa</p>
+          <p th:unless="${company}" class="text-white">Login Empresa</p>
+          <p th:if="${company}" th:text="${company.name}" class="text-white"></p>
         </a>
         <a th:href="@{/client/login}">
-          <p class="text-white">Login Cliente</p>
+          <p th:unless="${client}" class="text-white">Login Cliente</p>
+          <p th:if="${client}" th:text="${client.name}" class="text-white"></p>
         </a>
       </div>
   </div>
