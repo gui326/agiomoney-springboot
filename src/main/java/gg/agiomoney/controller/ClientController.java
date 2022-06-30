@@ -92,6 +92,34 @@ public class ClientController {
 		return "redirect:/client/home";
 	}
 	
+	@GetMapping("/client/delete")
+	public ModelAndView deleteClient(Model model, HttpSession session) {
+		ModelAndView mv = new ModelAndView("mensagem");
+		
+		Client client = (Client) session.getAttribute("client");
+		
+		clientService.deleteClient(client);
+		
+		session.removeAttribute("client");
+		
+		mv.addObject("mensagem", "Você excluiu a sua conta");
+		return mv;
+	}
+	
+	@GetMapping("/client/update")
+	public ModelAndView deleteClient(Model model, HttpSession session) {
+		ModelAndView mv = new ModelAndView("mensagem");
+		
+		Client client = (Client) session.getAttribute("client");
+		
+		clientService.deleteClient(client);
+		
+		session.removeAttribute("client");
+		
+		mv.addObject("mensagem", "Você excluiu a sua conta");
+		return mv;
+	}
+	
 	@GetMapping("/client/logout")
 	public ModelAndView logoutClient(HttpSession session) {
 		logger.trace("Entrou em index");

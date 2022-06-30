@@ -23,6 +23,12 @@ public class ClientService {
 		logger.trace("Entrou em salvar");
 		clientRepository.save(client);
 	}
+	
+	@Transactional
+	public void deleteClient(Client client) {
+		logger.trace("Entrou em salvar");
+		clientRepository.delete(client);;
+	}
 
 }
 
