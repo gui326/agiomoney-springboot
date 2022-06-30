@@ -107,17 +107,22 @@ public class ClientController {
 	}
 	
 	@GetMapping("/client/update")
-	public ModelAndView deleteClient(Model model, HttpSession session) {
-		ModelAndView mv = new ModelAndView("mensagem");
+	public ModelAndView updateClient(Model model, HttpSession session) {
+		ModelAndView mv = new ModelAndView("/client/updateClient");
 		
-		Client client = (Client) session.getAttribute("client");
+		Client client2 = (Client) session.getAttribute("client");
 		
-		clientService.deleteClient(client);
+		Client client = clientRepository.findById((long) client2.getCode()).get();
 		
-		session.removeAttribute("client");
-		
-		mv.addObject("mensagem", "Você excluiu a sua conta");
+		mv.addObject("client", client);
 		return mv;
+	}
+	
+	@PostMapping("/client/update")
+	public String updatedClient(Model model, Client client) {		
+		clientService.saveClient(client);
+		
+		return "redirect:/client/home";
 	}
 	
 	@GetMapping("/client/logout")
@@ -174,8 +179,6 @@ public class ClientController {
 		Page<Loan> pagina = loanRepository.findLoansByClientIdPaginacao(client.getCode(), pageable);
 		
 		logger.trace("client: {}", client.getCode());
-		
-
 
 		
 		// Para um visual mais harmonioso o maximoPaginasMostrar deve ser ímpar
@@ -212,7 +215,9 @@ public class ClientController {
 		mv.addObject("pagina", pagina);
 
 		
-		mv.addObject("client", client);
+		Client client2 = clientRepository.findById((long) client.getCode()).get();
+		
+		mv.addObject("client", client2);
 		logger.trace("Encaminhando para a view index");
 		return mv;
 	}
