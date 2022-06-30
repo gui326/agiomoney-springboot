@@ -1,5 +1,6 @@
 package gg.agiomoney.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,15 +90,48 @@ public class CompanyController {
 	}
 	
 	@GetMapping("/company/home")
-	public ModelAndView homeCompany(HttpSession session) {
+	public ModelAndView homeCompany(HttpSession session, @PageableDefault(size = 2) Pageable pageable) {
 		logger.trace("Entrou em index");
 		ModelAndView mv = new ModelAndView("/company/areaCompany");
 		
 		Company company = (Company) session.getAttribute("company");
 		
-		List<Loan> loans = loanRepository.findByCompanyCode(company.getCode());
+		Page<Loan> pagina = loanRepository.findLoansByCompanyIdPaginacao(company.getCode(), pageable);
 		
-		mv.addObject("loans", loans);
+		
+		// Para um visual mais harmonioso o maximoPaginasMostrar deve ser ímpar
+		int maximoPaginasMostrar = 4;
+		int metadeMaximoPaginasMostrar = maximoPaginasMostrar / 2;
+		int totalDePaginas = pagina.getTotalPages();
+		int paginaAtual = pagina.getNumber() + 1;
+		int inicio;
+		int fim;
+
+		if (totalDePaginas <= maximoPaginasMostrar) {
+			inicio = 1;
+			fim = totalDePaginas;
+		} else {
+			if (paginaAtual <= metadeMaximoPaginasMostrar + 1) {
+				inicio = 1;
+				fim = maximoPaginasMostrar;
+			} else {
+				inicio = paginaAtual - metadeMaximoPaginasMostrar;
+				if (paginaAtual + metadeMaximoPaginasMostrar <= totalDePaginas) {
+					fim = paginaAtual + metadeMaximoPaginasMostrar;
+				} else {
+					fim = totalDePaginas;
+					inicio = totalDePaginas - maximoPaginasMostrar + 1;
+				}
+			}
+		}
+		List<Integer> numerosPaginas = new ArrayList<>();
+		for (int cont = inicio; cont <= fim; cont++) {
+			numerosPaginas.add(cont);
+		}
+		
+		mv.addObject("numerosPaginas", numerosPaginas);
+		mv.addObject("pagina", pagina);
+				
 		mv.addObject("company", company);
 		
 		return mv;
