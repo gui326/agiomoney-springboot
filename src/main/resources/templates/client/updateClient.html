@@ -38,9 +38,8 @@
         <p>Digite os seus dados</p>
         
         <form th:action="@{/client/update}" th:object="${client}" method="post">
-        	<input type="hidden" th:field="*{code}"/>
-        	<input type="hidden" th:field="*{password}"/>
-        
+        	<input type="hidden" th:field="*{code}"/><input type="hidden" th:field="*{password}"/>
+               
 	        <input type="text" th:field="*{name}" class="form-control inputPatternOne" placeholder="Digite seu nome"/>
 	        <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:each="erro : ${#fields.errors('name')}" th:text="${erro} + '. '">
 	        Erro no nome

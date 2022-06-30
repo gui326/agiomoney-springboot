@@ -106,6 +106,34 @@ public class ClientController {
 		return mv;
 	}
 	
+	@PostMapping("/client/password")
+	public ModelAndView changePassword(Model model, HttpSession session, Client client) {
+		ModelAndView mv = new ModelAndView("mensagem");
+		
+		logger.trace("cliente antes {}", client);
+		
+		client.setPassword(passwordEncoder.encode(client.getPassword()));
+		logger.trace("cliente {}", client);
+		clientService.saveClient(client);
+		mv.addObject("mensagem", "Senha atualizada com sucesso");
+		return mv;
+	}
+	
+	@GetMapping("/client/password")
+	public ModelAndView updatePassword(Model model, HttpSession session) {
+		ModelAndView mv = new ModelAndView("/client/newPasswordClient");
+		
+		Client client2 = (Client) session.getAttribute("client");
+		
+		Client client = clientRepository.findById((long) client2.getCode()).get();
+		
+		client.setPassword("");
+		
+		mv.addObject("client", client);
+		return mv;
+	}
+	
+	
 	@GetMapping("/client/update")
 	public ModelAndView updateClient(Model model, HttpSession session) {
 		ModelAndView mv = new ModelAndView("/client/updateClient");
@@ -121,6 +149,10 @@ public class ClientController {
 	@PostMapping("/client/update")
 	public String updatedClient(Model model, Client client) {		
 		clientService.saveClient(client);
+		
+		if(client.getPassword() != null && client.getPassword().length() < 6){
+			
+		}
 		
 		return "redirect:/client/home";
 	}
