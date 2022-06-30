@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -88,15 +91,28 @@ public class ClientController {
 	}
 	
 	@PostMapping("/client/register")
-	public ModelAndView registeredClient(Client client) {
+	public ModelAndView registeredClient(@Valid Client client, BindingResult result) {
 		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("mensagem");
 		
-		clientService.saveClient(client);
+		if (result.hasErrors()) {
+			ModelAndView mv = new ModelAndView("/client/registerClient");
+			
+			logger.debug("O cliente recebido para inserir não é válido");
+			logger.debug("Erros encontrados:");
+			for(FieldError erro : result.getFieldErrors()) {
+				logger.debug("{}", erro);
+			}
+			logger.trace("Encaminhando para a view novocliente");
+			
+			return mv;
+		} else {
+			clientService.saveClient(client);
+			ModelAndView mv = new ModelAndView("mensagem");
+			mv.addObject("mensagem", "Cadastro Realizado com sucesso!, bem-vindo " + client.getName());
+			
+			return mv;
+		}
 		
-		mv.addObject("mensagem", "Cadastro Realizado com sucesso!, bem-vindo " + client.getName());
-		
-		return mv;
 	}
 	
 	@GetMapping("/client/home")
@@ -162,26 +178,34 @@ public class ClientController {
 	public ModelAndView clientLoans(HttpSession session, Double value, int installments) {
 		ModelAndView mv = new ModelAndView("/client/loanClient");
 		
-		List<Company> companies = companyRepository.findAll();
-		List<Loan> loans = new ArrayList<Loan>();
-		
-		Client clientSession = (Client) session.getAttribute("client");
-		
-		Optional<Client> client = clientRepository.findById(clientSession.getCode());
-		
-		for(Company company : companies) {
-			Loan loan = new Loan();
-			loan.setClient(client.get());
-			loan.setCompany(company);
-			loan.setInstallments(installments);
-			loan.setState("Pendente");
-			loan.setTotal(company.getTax() * value);
-			loans.add(loan);
+		if(value != null) {
+			if(value > 0) {
+				List<Company> companies = companyRepository.findAll();
+				List<Loan> loans = new ArrayList<Loan>();
+				
+				Client clientSession = (Client) session.getAttribute("client");
+				
+				Optional<Client> client = clientRepository.findById(clientSession.getCode());
+				
+				for(Company company : companies) {
+					Loan loan = new Loan();
+					loan.setClient(client.get());
+					loan.setCompany(company);
+					loan.setInstallments(installments);
+					loan.setState("Pendente");
+					loan.setTotal(company.getTax() * value);
+					loans.add(loan);
+				}
+				
+				mv.addObject("loans", loans);
+				mv.addObject("value", value);
+				mv.addObject("installments", installments);
+			} else {
+				mv.addObject("error", "valor precisa ser maior que 0");
+			}
+		} else {
+			mv.addObject("error", "valor necessário");
 		}
-		
-		mv.addObject("loans", loans);
-		mv.addObject("value", value);
-		mv.addObject("installments", installments);
 		
 		return mv;
 	}

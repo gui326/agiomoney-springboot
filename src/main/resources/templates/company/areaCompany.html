@@ -41,7 +41,10 @@
             <p>Área Empresa</p>
             <p>.</p>
             <p th:text="${company.name}">Banco fulano</p>
+            
         </div>
+        
+        <p class="text-danger" th:text="${mensagemError}"></p>
 
         <div class="mt-2 row" style="overflow-y: auto">
 	        <div class="mb-4 col-md-6" th:each="loan : ${pagina}">

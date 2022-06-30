@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +15,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import gg.agiomoney.model.Client;
 import gg.agiomoney.model.Company;
 import gg.agiomoney.model.Loan;
 import gg.agiomoney.repository.CompanyRepository;
@@ -78,15 +81,26 @@ public class CompanyController {
 	}
 	
 	@PostMapping("/company/register")
-	public ModelAndView registeredCompany(Company company) {
-		logger.trace("Entrou em index");
-		ModelAndView mv = new ModelAndView("mensagem");
-		mv.addObject("mensagem", "Cadastro realizado com sucesso!, bem-vindo " + company.getName());
-		
-		companyService.saveCompany(company);
-		
-		logger.trace("Encaminhando para a view index");
-		return mv;
+	public ModelAndView registeredCompany(@Valid Company company, BindingResult result) {
+
+		if (result.hasErrors()) {
+			ModelAndView mv = new ModelAndView("/company/registerCompany");
+			
+			logger.debug("A empresa recebido para inserir não é válido");
+			logger.debug("Erros encontrados:");
+			for(FieldError erro : result.getFieldErrors()) {
+				logger.debug("{}", erro);
+			}
+			logger.trace("Encaminhando para a view novocliente");
+			
+			return mv;
+		} else {
+			companyService.saveCompany(company);
+			ModelAndView mv = new ModelAndView("mensagem");
+			mv.addObject("mensagem", "Cadastro foi realizado com sucesso!, bem-vindo " + company.getName());
+			
+			return mv;
+		}
 	}
 	
 	@GetMapping("/company/home")
@@ -150,14 +164,20 @@ public class CompanyController {
 	}
 	
 	@PostMapping("/company/loan/proposal")
-	public String companyProposalLoan(String codeLoan, Double newTotal) {
+	public String companyProposalLoan(String codeLoan, Double newTotal, RedirectAttributes atributos) {
 		Optional<Loan> op = loanRepository.findById((long) Integer.parseInt(codeLoan));
 		Loan loan = op.get();
 		
-		loan.setState("Contraproposta");
-		loan.setTotal(newTotal);
+		if(newTotal != null) {
 		
-		loanService.saveLoan(loan);
+			loan.setState("Contraproposta");
+			loan.setTotal(newTotal);
+			
+			loanService.saveLoan(loan);
+		
+		} else {
+			atributos.addFlashAttribute("mensagemError", "Valor necessário!");
+		}
 		
 		return "redirect:/company/home";
 	}

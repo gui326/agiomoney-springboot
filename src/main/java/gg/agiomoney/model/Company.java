@@ -9,6 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "company")
@@ -21,9 +25,19 @@ public class Company implements Serializable{
 	@GeneratedValue(generator = "generator", strategy = GenerationType.SEQUENCE)
 	private Long code;
 	
+	@NotBlank(message = "O nome é obrigatório")
+	@Size(min = 1, max = 255, message = "O nome deve ter entre 1 e 255 caracteres")
 	private String name;
+	
+	@NotBlank(message = "O e-mail é obrigatório")
+	@Email(message = "O e-mail deve ser bem formatado?")
 	private String email;
+	
+	@NotBlank(message = "A senha é obrigatória")
+	@Size(min = 6, max = 32, message = "A senha deve ter entre 6 e 32 caracteres")
 	private String password;
+	
+	@NotNull(message = "A taxa é obrigatória")
 	private Float tax;
 	
 	@Override

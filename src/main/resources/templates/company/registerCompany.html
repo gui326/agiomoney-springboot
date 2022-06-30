@@ -43,12 +43,24 @@
 		<form th:action="@{/company/register}" th:object="${company}" method="post">
 		
 	        <input type="text" th:field="*{name}" class="form-control inputPatternOne" placeholder="Digite o seu nome"/>
+	        <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:each="erro : ${#fields.errors('name')}" th:text="${erro} + '. '">
+	        Erro no nome
+	        </span>
 	        
 	        <input type="email" th:field="*{email}" class="mt-3 form-control inputPatternOne" placeholder="Digite seu email"/>
+	        <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:each="erro : ${#fields.errors('email')}" th:text="${erro} + '. '">
+	        Erro no nome
+	        </span>
 	
 	        <input type="password" th:field="*{password}" class="mt-3 form-control inputPatternOne" placeholder="Digite sua senha"/>
+	        <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:each="erro : ${#fields.errors('password')}" th:text="${erro} + '. '">
+	        Erro no nome
+	        </span>
 	        
 	        <input type="text" th:field="*{tax}" class="mt-3 form-control inputPatternOne" placeholder="Digite sua taxa"/>
+	        <span class="text-danger" th:if="${#fields.hasErrors('tax')}" th:each="erro : ${#fields.errors('tax')}" th:text="${erro} + '. '">
+	        Erro no nome
+	        </span>
 	
 	        <button type="submit" class="mt-4 btn btn-primary w-100 buttonPatternOne">
 	            Cadastrar

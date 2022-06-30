@@ -53,6 +53,9 @@
 	        	<div class="col-md-3">
 		        	<label>Valor do empréstimo</label>
 		            <input type="text" name="value" th:value="${value}" class="form-control inputPatternOne" />
+		            <span class="text-danger" th:text="${error}">
+	        			Erro no nome
+	        		</span>
 	            </div>
 	            <div class="col-md-2">
 		        	<label>Parcelas</label>
