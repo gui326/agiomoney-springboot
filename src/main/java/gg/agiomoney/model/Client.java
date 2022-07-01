@@ -33,7 +33,7 @@ public class Client implements Serializable{
 	private String email;
 	
 	@NotBlank(message = "A senha é obrigatória")
-	@Size(min = 6, max = 32, message = "A senha deve ter entre 6 e 32 caracteres")
+	@Size(min = 6, max = 255, message = "A senha deve ter entre 6 e 32 caracteres")
 	private String password;
 	
 	public Long getCode() {

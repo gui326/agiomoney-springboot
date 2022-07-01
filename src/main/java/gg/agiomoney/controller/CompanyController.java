@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -46,6 +47,9 @@ public class CompanyController {
 	@Autowired
 	private LoanService loanService;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	@GetMapping("/company/login")
 	public String loginCompanyView(HttpSession session, Model model) {
 		
@@ -67,7 +71,9 @@ public class CompanyController {
 			return "/company/loginCompany";
 		}
 		
-		if(!company.getPassword().equals(password)) {
+		Boolean correctPassowrd  = passwordEncoder.matches(password, company.getPassword());
+		
+		if(!correctPassowrd) {
 			model.addAttribute("mensagem", "Senha incorreta");
 			return "/company/loginCompany";
 		}
@@ -110,6 +116,7 @@ public class CompanyController {
 			
 			return mv;
 		} else {
+			company.setPassword(passwordEncoder.encode(company.getPassword()));
 			companyService.saveCompany(company);
 			ModelAndView mv = new ModelAndView("mensagem");
 			mv.addObject("mensagem", "Cadastro foi realizado com sucesso!, bem-vindo " + company.getName());

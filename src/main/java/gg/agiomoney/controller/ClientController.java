@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -48,6 +49,9 @@ public class ClientController {
 	@Autowired
 	private LoanService loanService;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	private static final Logger logger = LoggerFactory.getLogger(ClientController.class);
 	
 	@GetMapping("/client/login")
@@ -76,10 +80,9 @@ public class ClientController {
 			return "/client/loginClient";
 		}
 		
-		logger.trace("senha: {}", client.getPassword());
-		logger.trace("senha: {}", password);
+		Boolean correctPassowrd  = passwordEncoder.matches(password, client.getPassword());
 		
-		if(!client.getPassword().equals(password)) {
+		if(!correctPassowrd) {
 			model.addAttribute("mensagem", "Senha incorreta");
 			return "/client/loginClient";
 		}
@@ -115,7 +118,7 @@ public class ClientController {
 			ModelAndView mv = new ModelAndView("/client/registerClient");
 			
 			logger.debug("O cliente recebido para inserir não é válido");
-			logger.debug("Erros encontrados:");
+			logger.debug("Erros enscontrados:");
 			for(FieldError erro : result.getFieldErrors()) {
 				logger.debug("{}", erro);
 			}
@@ -123,6 +126,7 @@ public class ClientController {
 			
 			return mv;
 		} else {
+			client.setPassword(passwordEncoder.encode(client.getPassword()));
 			clientService.saveClient(client);
 			ModelAndView mv = new ModelAndView("mensagem");
 			mv.addObject("mensagem", "Cadastro Realizado com sucesso!, bem-vindo " + client.getName());
